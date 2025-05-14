@@ -5403,7 +5403,20 @@ export interface components {
       limit?: number;
       increment?: number;
     };
-    TimeControl: components["schemas"]["TimeControl"];
+    TimeControl:
+      | {
+          type: "clock";
+          limit: number;
+          increment: number;
+          show: string;
+        }
+      | {
+          type: "correspondence";
+          daysPerTurn: number;
+        }
+      | {
+          type: "unlimited";
+        };
     /**
      * @description 10: created, 20: started, 30: finished
      *
@@ -6517,8 +6530,78 @@ export interface components {
       challenge?: components["schemas"]["ChallengeJson"];
       compat?: {
         bot?: boolean;
-        board?: boolean; 
+        board?: boolean;
       };
+    };
+    /** @example {
+     *       "id": "H9fIRZUk",
+     *       "url": "https://lichess.org/H9fIRZUk",
+     *       "status": "created",
+     *       "challenger": {
+     *         "id": "bot1",
+     *         "name": "Bot1",
+     *         "rating": 1500,
+     *         "title": "BOT",
+     *         "provisional": true,
+     *         "online": true,
+     *         "lag": 4
+     *       },
+     *       "destUser": {
+     *         "id": "bobby",
+     *         "name": "Bobby",
+     *         "rating": 1635,
+     *         "title": "GM",
+     *         "provisional": true,
+     *         "online": true,
+     *         "lag": 4
+     *       },
+     *       "variant": {
+     *         "key": "standard",
+     *         "name": "Standard",
+     *         "short": "Std"
+     *       },
+     *       "rated": true,
+     *       "speed": "rapid",
+     *       "timeControl": {
+     *         "type": "clock",
+     *         "limit": 600,
+     *         "increment": 0,
+     *         "show": "10+0"
+     *       },
+     *       "color": "random",
+     *       "finalColor": "black",
+     *       "perf": {
+     *         "icon": "",
+     *         "name": "Rapid"
+     *       },
+     *       "direction": "out"
+     *     } */
+    ChallengeCanceledJson: {
+      id: string;
+      /** Format: uri */
+      url: string;
+      status: components["schemas"]["ChallengeStatus"];
+      challenger: components["schemas"]["ChallengeUser"];
+      destUser: components["schemas"]["ChallengeUser"] | null;
+      variant: components["schemas"]["Variant"];
+      rated: boolean;
+      speed: components["schemas"]["Speed"];
+      timeControl: components["schemas"]["TimeControl"];
+      /** @enum {string} */
+      color: "white" | "black" | "random";
+      /** @enum {string} */
+      finalColor?: "white" | "black";
+      perf: {
+        icon?: string;
+        name?: string;
+      };
+      /** @enum {string} */
+      direction?: "in" | "out";
+      initialFen?: string;
+      /** @description Human readable, possibly translated reason why the challenge was declined. */
+      declineReason?: string;
+      /** @description Untranslated, computer-matchable reason why the challenge was declined. */
+      declineReasonKey?: string;
     };
     ChallengeCanceledEvent: {
       /** @constant */
@@ -6528,7 +6611,7 @@ export interface components {
     /** @example {
      *       "id": "VU0nyvsW"
      *     } */
-    ChallengeCanceledJson: {
+    ChallengeDeclinedJson: {
       id?: string;
     };
     ChallengeDeclinedEvent: {
